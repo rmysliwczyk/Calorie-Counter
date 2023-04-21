@@ -1,0 +1,51 @@
+{% extends "layout.htm" %}
+{% block body %}
+<h1>Add meal</h1>
+<form action="/addmeal" method="get">
+<div class="m-3 p-2 bg-body-secondary rounded-2">
+    <label class="form-label" for="product">Enter product name:</label>
+    <input class="form-control" list="product_options" name="product" id="product" placeholder="Find product...">
+    <datalist id="product_options">
+        {% for product in products %}
+            <option>{{product[1]}}</option>
+        {% endfor %}
+    </datalist>
+</div>  
+<button class="btn btn-primary" type="submit">Show product</button>
+
+
+</form>
+{% if selected_product is defined %}
+<table class="table">
+    <tr>
+        <th> Product: </th>
+        <th> Calories </th>
+        <th> Fats </th>
+        <th> Carbs </th>
+        <th> Proteins </th>
+        <th> Portion size </th>
+    </tr>
+
+    <tr>
+        <td> {{selected_product[1]}} </td>
+        <td> {{selected_product[2]}}kcal </td>
+        <td> {{selected_product[3]}}g </td>
+        <td> {{selected_product[4]}}g </td>
+        <td> {{selected_product[5]}}g </td>
+        <td> {{selected_product[6]}}g </td>
+    </tr>
+</table>
+
+<form action=/addmeal method="post">
+<div class="m-3 p-2 bg-body-secondary rounded-2">
+<label class="form-label" for="product_name"> Selected product: </label>
+<input class="form-control" readonly autocomplete="off" type="text" id="product_name" name="product_name" value="{{selected_product[1]}}">
+<label class="form-label" for="date"> Date: </label>
+<input class="form-control" autocomplete="off" type="date" id="date" name="date" value="{{todays_date}}">
+<label class="form-label" for="weight"> Weight: </label>
+<input class="form-control" autocomplete="off" type="number" step="0.1" name="weight" id="weight" min="0.0">
+</div>
+<button class="btn btn-primary" type="submit">Add meal</button>
+</form>
+{% endif %}
+{% endblock %}

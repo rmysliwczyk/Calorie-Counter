@@ -1,0 +1,23 @@
+{% extends "layout.htm" %}
+{% block title %}"Add new product to the database"{% endblock %}
+{% block body %}
+<h2 class="pt-5"> Add new product to the database </h2>
+<form action=/addproduct method="post">
+<div class="m-3 p-2 bg-body-secondary rounded-2">
+	<label class="form-label" for="product_name">* Product name:</label>
+	<input class="form-control " autocomplete="off" type="text" id="product_name" name="product_name">
+	<label class="form-label mt-3" for="calories">* Calories kcal/100g</label>
+	<input class="form-control" autocomplete="off" type="number" id="calories" name="calories" step="0.1" min="0.0">
+	<label class="form-label mt-3" for="fats">* Fats g/100g:</label>
+	<input class="form-control" autocomplete="off" type="number" id="fats" name="fats" step="0.1" min="0.0">
+	<label class="form-label mt-3" for="carbohydrates">* Carbohydrates g/100g:</label>
+	<input class="form-control" autocomplete="off" type="number" id="carbohydrates" name="carbohydrates" step="0.1" min="0.0">
+	<label class="form-label mt-3" for="proteins">* Proteins g/100g:</label>
+	<input class="form-control" autocomplete="off" type="number" id="proteins" name="proteins" step="0.1" min="0.0">
+	<label class="form-label mt-3" for="portion_size">Portion size in g:</label>
+	<input class="form-control" autocomplete="off" type="number" id="portion_size" name="portion_size" step="0.1" min="0.0">
+</div>
+<button class="btn btn-primary" type="submit">Add product</button>
+<p1>* - Required fields</p1>
+</form>
+{% endblock %}

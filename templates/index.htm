@@ -1,0 +1,28 @@
+{% extends "layout.htm" %}
+{% block body %}
+<h2 class="pt-5">Summary</h2>
+    <table class="table">
+        <tr>
+            <th> Product: </th>
+            <th> Weight: </th>
+            <th> Calories: </th>
+            <th> Delete meal: </th>
+        </tr>
+{% for meal in meals %}
+        <tr>
+            <td> {{meal[3]}} </td>
+            <td> {{meal[4]}} </td>
+            <td> {{meal[5]}} </td>
+            <td> <form action="/" method="post"> <button class="btn-close" id="meal_to_delete" name="meal_to_delete" value="{{meal[0]}}"></button> </form> </td>
+        </tr>
+{% endfor %}
+</table>
+<div class="badge bg-primary text-wrap"><p class="h5">CALORIE TOTAL: {{calorie_total}}</p></div>
+<form action="/" method="get">
+    <div class="m-3 p-3 bg-body-secondary rounded-2">
+        <label class="form-label" for="selected_date">Select different date:</label>
+        <input class="form-control" type="date" name="selected_date" id="selected_date" value={{selected_date}}>
+    </div>
+    <button class="btn btn-primary" type="submit">Show selected date</button>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "layout.htm" %}
+{% block body %}
+<h2 class="pt-5">Register</h2>
+<form action="/register" method="post">
+<div class="m-3 p-3 bg-body-secondary rounded-2">
+    <label class="form-label" for="username">Username:</label>
+    <input class="form-control" type="text" name="username" id="username" autocomplete="off">
+    <label class="form-label" for="password">Password:</label>
+    <input class="form-control" type="password" name="password" id="password" autocomplete="off">
+</div>
+<button class="btn btn-primary" type="submit">Register user</button>
+</form>
+{% endblock %}

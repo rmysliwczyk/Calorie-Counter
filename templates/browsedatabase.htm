@@ -1,0 +1,26 @@
+{% extends "layout.htm" %}
+{% block title %}Browse products database{% endblock %}
+{% block body %}
+<h2 class="pt-5">Browse database</h2>
+<table class="table">
+    <tr>
+        <th> Product: </th>
+        <th> Calories </th>
+        <th> Fats </th>
+        <th> Carbs </th>
+        <th> Proteins </th>
+    </tr>
+{% for product in products %}
+
+    <tr>
+        <td> {{product[1]}} </td>
+        <td> {{product[2]}}kcal </td>
+        <td> {{product[3]}}g </td>
+        <td> {{product[4]}}g </td>
+        <td> {{product[5]}}g </td>
+    </tr>
+
+{% endfor %}
+</table>
+
+{% endblock %}
