@@ -95,7 +95,7 @@ def register():
 @app.route("/browsedatabase")
 @login_required
 def browsedatabase():
-    res = cur.execute("SELECT * FROM products ORDER BY product_name DESC")
+    res = cur.execute("SELECT * FROM products")
     res = res.fetchall()
     return render_template("browsedatabase.htm", products=res)
 
