@@ -1,0 +1,1 @@
+This is a web app made with Flask, which allows multiple users to add their daily meals for the purpose of keeping track of the user's daily calorie intake. This is a personal project which I started with the goal of learning more about the process of app development and programming in general.
