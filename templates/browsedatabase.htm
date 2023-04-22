@@ -9,6 +9,7 @@
         <th> Fats </th>
         <th> Carbs </th>
         <th> Proteins </th>
+        <th> Delete entry </th>
     </tr>
 {% for product in products %}
 
@@ -18,6 +19,7 @@
         <td> {{product[3]}}g </td>
         <td> {{product[4]}}g </td>
         <td> {{product[5]}}g </td>
+        <td><form action="/browsedatabase" method="post"><button class="btn-close" id="product_to_delete" name="product_to_delete" value="{{product[0]}}"></button></form></td>
     </tr>
 
 {% endfor %}

@@ -92,9 +92,13 @@ def register():
     return redirect("/login")
 
 
-@app.route("/browsedatabase")
+@app.route("/browsedatabase", methods=["GET", "POST"])
 @login_required
 def browsedatabase():
+    if request.method == "POST":
+        cur.execute("DELETE FROM products WHERE id=?",(request.form.get("product_to_delete"),))
+        con.commit()
+
     res = cur.execute("SELECT * FROM products ORDER BY product_name ASC")
     res = res.fetchall()
     return render_template("browsedatabase.htm", products=res)
