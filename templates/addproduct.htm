@@ -2,8 +2,15 @@
 {% block title %}"Add new product to the database"{% endblock %}
 {% block body %}
 <h2 class="pt-5"> Add new product to the database </h2>
+<form action=/scanbarcode method="get">
+	<input type="hidden" id="barcode_request_origin" name="barcode_request_origin" value="addproduct">
+	<button class="btn btn-primary" type="submit">Scan Barcode</button>
+</form>
 <form action=/addproduct method="post">
 <div class="m-3 p-2 bg-body-secondary rounded-2">
+	<label class="form-label" for="barcode"> Barcode </label>
+	<input class="form-control" type="number" id="barcode" name="barcode" value="{{barcode}}">
+
 	<label class="form-label" for="product_name">* Product name:</label>
 	<input class="form-control " autocomplete="off" type="text" id="product_name" name="product_name">
 	<label class="form-label mt-3" for="calories">* Calories kcal/100g</label>

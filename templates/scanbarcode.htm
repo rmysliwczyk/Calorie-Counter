@@ -1,0 +1,10 @@
+{% extends "layout.htm" %}
+{% block title %}Scan Barcode{% endblock %}
+{% block body %}
+<p>TODO: Taking barcode picture</p>
+<form action="/scanbarcode" method="post">
+    <input type="hidden" id="barcode_request_origin" name="barcode_request_origin" value="{{barcode_request_origin}}">
+    <input class="form-control" type="number" id="barcode" name="barcode">
+    <button class="btn btn-primary" type="submit">Get Barcode</button>
+</form>
+{% endblock %}

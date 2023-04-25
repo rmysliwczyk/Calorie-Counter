@@ -143,18 +143,18 @@ def addmeal():
 
 @app.route("/addproduct", methods=["GET", "POST"])
 @login_required
-def addnewproduct():
+def addproduct():
     if request.method == "GET":
-        return render_template("addproduct.htm")
+        barcode = session.get("barcode")
+        return render_template("addproduct.htm", barcode=barcode)
     else:
-
         product_name = request.form.get("product_name").strip()
         calories = request.form.get("calories")
         fats = request.form.get("fats")
         carbohydrates = request.form.get("carbohydrates")
         proteins = request.form.get("proteins")
         portion_size = request.form.get("portion_size")
-        barcode = request.form.get("barcode")
+        
 
         if not product_name or not calories or not  proteins or not fats or not carbohydrates:
             return handle_error("Missing required fields")
@@ -168,6 +168,16 @@ def addnewproduct():
             return render_template("addproduct.htm")
         
         return handle_error("Couldn't add product to database")
+
+@app.route("/scanbarcode", methods=["GET", "POST"])
+@login_required
+def scanbarcode():
+    if request.method == "POST":
+        if request.form.get("barcode_request_origin") == "addproduct":
+            session["barcode"] = request.form.get("barcode")
+            return redirect("/addproduct")
+    return render_template("scanbarcode.htm", barcode_request_origin=request.args.get("barcode_request_origin"))
+
 
 def handle_error(error_message):
     print(error_message)
