@@ -1,10 +1,33 @@
 {% extends "layout.htm" %}
 {% block title %}Scan Barcode{% endblock %}
 {% block body %}
-<p>TODO: Taking barcode picture</p>
+<!-- The functionality of scanning the barcodes is provided by https://github.com/mebjas/html5-qrcode -->
+<div id="reader"></div>
+
 <form action="/scanbarcode" method="post">
     <input type="hidden" id="barcode_request_origin" name="barcode_request_origin" value="{{barcode_request_origin}}">
-    <input class="form-control" type="number" id="barcode" name="barcode">
+    <input class="form-control" type="text" id="barcode" name="barcode" value="">
     <button class="btn btn-primary" type="submit">Get Barcode</button>
 </form>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+function onScanSuccess(decodedText, decodedResult) {
+  // handle the scanned code as you like, for example:
+  document.getElementById("barcode").setAttribute('value', decodedResult.decodedText);
+  console.log(`Code matched = ${decodedText}`, decodedResult);
+}
+
+function onScanFailure(error) {
+  // handle scan failure, usually better to ignore and keep scanning.
+  // for example:
+  console.warn(`Code scan error = ${error}`);
+}
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+  "reader",
+  { fps: 10, qrbox: {width: 250, height: 250} },
+  /* verbose= */ false);
+html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+</script>
 {% endblock %}
