@@ -13,10 +13,6 @@
 <script>
 function onScanSuccess(decodedText, decodedResult) {
   // handle the scanned code as you like, for example:
-  document.getElementById("barcode").setAttribute('value', decodedResult.decodedText);
-  console.log(`Code matched = ${decodedText}`, decodedResult);
-
-  // source: https://stackoverflow.com/a/29641185
   var context = new AudioContext();
   var oscillator = context.createOscillator();
   oscillator.type = "sine";
@@ -26,10 +22,14 @@ function onScanSuccess(decodedText, decodedResult) {
   // Beep for 500 milliseconds
   setTimeout(function () {
       oscillator.stop();
-  }, 100);                
-            
-  document.getElementById("barcode_form").submit();
+  }, 100);
+
+  document.getElementById("barcode").setAttribute('value', decodedResult.decodedText);
+  console.log(`Code matched = ${decodedText}`, decodedResult);
+
   html5QrCode.stop();
+  // source: https://stackoverflow.com/a/29641185
+  setTimeout(document.getElementById("barcode_form").submit(),1000);
 }
 
 function onScanFailure(error) {

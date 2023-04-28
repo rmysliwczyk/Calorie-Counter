@@ -108,7 +108,12 @@ def browsedatabase():
 def addmeal():
     if request.method == "GET":
         product_name = request.args.get("product")
-        if not product_name:
+        barcode = session.get("barcode")
+        if barcode:
+            res = cur.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
+            res = res.fetchone()
+            return render_template("addmeal.htm", selected_product=res, todays_date = date.today())
+        elif not product_name:
             res = cur.execute("SELECT * FROM products")
             res = res.fetchall()
             return render_template("addmeal.htm", products=res)
@@ -116,7 +121,6 @@ def addmeal():
             product_name = product_name.strip()
             res = cur.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
             res = res.fetchone()
-            print(res)
             return render_template("addmeal.htm", selected_product=res, todays_date = date.today())
     else:
         meal_date = request.form.get("date")
@@ -146,6 +150,7 @@ def addmeal():
 def addproduct():
     if request.method == "GET":
         barcode = session.get("barcode")
+        session["barcode"] = None
         return render_template("addproduct.htm", barcode=barcode)
     else:
         product_name = request.form.get("product_name").strip()
@@ -154,7 +159,7 @@ def addproduct():
         carbohydrates = request.form.get("carbohydrates")
         proteins = request.form.get("proteins")
         portion_size = request.form.get("portion_size")
-        
+        barcode_post = request.form.get("barcode")
 
         if not product_name or not calories or not  proteins or not fats or not carbohydrates:
             return handle_error("Missing required fields")
@@ -163,7 +168,7 @@ def addproduct():
         else:
             cur.execute(
             "INSERT INTO products (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode) VALUES (?,?,?,?,?,?,?) ",
-            (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode))
+            (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode_post))
             con.commit()
             return render_template("addproduct.htm")
         
@@ -173,9 +178,11 @@ def addproduct():
 @login_required
 def scanbarcode():
     if request.method == "POST":
+        session["barcode"] = request.form.get("barcode")
         if request.form.get("barcode_request_origin") == "addproduct":
-            session["barcode"] = request.form.get("barcode")
             return redirect("/addproduct")
+        elif request.form.get("barcode_request_origin") == "addmeal":
+            return redirect("/addmeal")
     return render_template("scanbarcode.htm", barcode_request_origin=request.args.get("barcode_request_origin"))
 
 
