@@ -1,2 +1,4 @@
 flask_session/
-__pycache__
+__pycache_
+cert.pem
+key.pem

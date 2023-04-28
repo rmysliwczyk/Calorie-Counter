@@ -4,10 +4,9 @@
 <!-- The functionality of scanning the barcodes is provided by https://github.com/mebjas/html5-qrcode -->
 <div id="reader"></div>
 
-<form action="/scanbarcode" method="post">
+<form action="/scanbarcode" method="post" id="barcode_form">
     <input type="hidden" id="barcode_request_origin" name="barcode_request_origin" value="{{barcode_request_origin}}">
     <input class="form-control" type="text" id="barcode" name="barcode" value="">
-    <button class="btn btn-primary" type="submit">Get Barcode</button>
 </form>
 
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -16,6 +15,21 @@ function onScanSuccess(decodedText, decodedResult) {
   // handle the scanned code as you like, for example:
   document.getElementById("barcode").setAttribute('value', decodedResult.decodedText);
   console.log(`Code matched = ${decodedText}`, decodedResult);
+
+  // source: https://stackoverflow.com/a/29641185
+  var context = new AudioContext();
+  var oscillator = context.createOscillator();
+  oscillator.type = "sine";
+  oscillator.frequency.value = 800;
+  oscillator.connect(context.destination);
+  oscillator.start(); 
+  // Beep for 500 milliseconds
+  setTimeout(function () {
+      oscillator.stop();
+  }, 100);                
+            
+  document.getElementById("barcode_form").submit();
+  html5QrCode.stop();
 }
 
 function onScanFailure(error) {
@@ -24,10 +38,13 @@ function onScanFailure(error) {
   console.warn(`Code scan error = ${error}`);
 }
 
-let html5QrcodeScanner = new Html5QrcodeScanner(
-  "reader",
-  { fps: 10, qrbox: {width: 250, height: 250} },
-  /* verbose= */ false);
-html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+const html5QrCode = new Html5Qrcode("reader");
+const config = {fps: 10, qrbox: { width: 250, height:250 } };
+html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure);
+//let html5QrcodeScanner = new Html5QrcodeScanner(
+//  "reader",
+//  { fps: 10, qrbox: {width: 250, height: 250},
+//  /* verbose= */ false);
+//html5QrcodeScanner.render(onScanSuccess, onScanFailure); 
 </script>
 {% endblock %}
