@@ -139,10 +139,7 @@ def addmeal():
 
             cur.execute("INSERT INTO meals (date, username, product_name, weight, calories) VALUES (?,?,?,?,?)", (meal_date, session["user"], product_name, meal_weight, session["new_meal_calories"]))
             con.commit()
-
-            res = cur.execute("SELECT * FROM products")
-            res = res.fetchall()
-            return render_template("addmeal.htm", products=res)
+            return redirect("/")
 
 
 @app.route("/addproduct", methods=["GET", "POST"])
