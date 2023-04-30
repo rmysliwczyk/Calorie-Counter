@@ -34,9 +34,8 @@ def index():
     for result in res:
 
         if str(result[1]) == str(selected_date):
-         session["calories_today"] = session["calories_today"] + result[5]
+         session["calories_today"] = round(session["calories_today"] + result[5], 2)
 
-    print(selected_date)
     return render_template("index.htm", meals=res, calorie_total=session["calories_today"], selected_date=selected_date)
 
 @app.route("/logout")
