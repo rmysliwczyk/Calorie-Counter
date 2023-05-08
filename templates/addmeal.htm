@@ -7,16 +7,23 @@
     <button class="btn btn-primary" type="submit">Scan Barcode</button>
 </form>
 <form action="/addmeal" method="get">
-<div class="m-3 p-2 bg-body-secondary rounded-2">
-    <label class="form-label" for="product">Enter product name:</label>
-    <input class="form-control" list="product_options" name="product" id="product" placeholder="Find product...">
+<div class="m-3 p-2 bg-body-secondary rounded-2 row">
+    <div class="col">
+        <label class="col-form-label" for="product">Enter product name:</label>
+    </div>
+    <div class="col">
+        <input class="form-control" list="product_options" name="product" id="product" placeholder="Find product...">
     <datalist id="product_options">
         {% for product in products %}
             <option>{{product[1]}}</option>
         {% endfor %}
     </datalist>
+    </div>
+    <div class="col">
+        <button class="btn btn-primary" type="submit">Show product</button>
+    </div>
 </div>  
-<button class="btn btn-primary" type="submit">Show product</button>
+
 
 
 </form>
@@ -43,14 +50,34 @@
 
 <form action=/addmeal method="post">
 <div class="m-3 p-2 bg-body-secondary rounded-2">
-<label class="form-label" for="product_name"> Selected product: </label>
-<input class="form-control" readonly autocomplete="off" type="text" id="product_name" name="product_name" value="{{selected_product[1]}}">
-<label class="form-label" for="date"> Date: </label>
-<input class="form-control" autocomplete="off" type="date" id="date" name="date" value="{{todays_date}}">
-<label class="form-label" for="weight"> Weight: </label>
-<input class="form-control" autocomplete="off" autofocus="on" type="number" step="0.1" name="weight" id="weight" min="0.0">
+<div class="row m-1 g-3 align-items-center">
+    <div class="col-2">
+        <label class="col-form-label" for="product_name"> Selected product: </label>
+    </div>
+    <div class="col">
+        <input class="form-control" readonly autocomplete="off" type="text" id="product_name" name="product_name" value="{{selected_product[1]}}">
+    </div>
 </div>
-<button class="btn btn-primary" type="submit">Add meal</button>
+<div class="row m-1 g-3 align-items-center">
+    <div class="col-2">
+        <label class="col-form-label" for="date"> Date: </label>
+    </div>
+    <div class="col">
+        <input class="form-control" autocomplete="off" type="date" id="date" name="date" value="{{todays_date}}">
+    </div>
+</div>
+<div class="row m-1 g-3 align-items-center">
+    <div class="col-2">
+        <label class="col-form-label" for="weight"> Weight: </label>
+    </div>
+    <div class="col">
+        <input class="form-control" autocomplete="off" autofocus="on" type="number" step="0.1" name="weight" id="weight" min="0.0">
+    </div>
+    <div class="col">
+        <button class="btn btn-primary" type="submit">Add meal</button>
+    </div>
+</div>
+</div>
 </form>
 {% endif %}
 {% endblock %}
