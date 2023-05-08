@@ -108,6 +108,7 @@ def addmeal():
     if request.method == "GET":
         product_name = request.args.get("product")
         barcode = session.get("barcode")
+        session["barcode"] = None
         if barcode:
             res = cur.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
             res = res.fetchone()
