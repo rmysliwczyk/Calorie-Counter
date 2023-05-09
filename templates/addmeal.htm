@@ -1,6 +1,6 @@
 {% extends "layout.htm" %}
 {% block body %}
-<h1>Add meal</h1>
+<h2 class="pt-5">Add meal</h2>
 
 <form action=/scanbarcode method="get">
     <input type="hidden" id="barcode_request_origin" name="barcode_request_origin" value="addmeal">
@@ -8,9 +8,6 @@
 </form>
 <form action="/addmeal" method="get">
 <div class="m-3 p-2 bg-body-secondary rounded-2 row">
-    <div class="col">
-        <label class="col-form-label" for="product">Enter product name:</label>
-    </div>
     <div class="col">
         <input class="form-control" list="product_options" name="product" id="product" placeholder="Find product...">
     <datalist id="product_options">
@@ -23,39 +20,43 @@
         <button class="btn btn-primary" type="submit">Show product</button>
     </div>
 </div>  
-
-
-
 </form>
-{% if selected_product is defined %}
-<table class="table">
-    <tr>
-        <th> Product: </th>
-        <th> Calories </th>
-        <th> Fats </th>
-        <th> Carbs </th>
-        <th> Proteins </th>
-        <th> Portion size </th>
-    </tr>
 
-    <tr>
-        <td> {{selected_product[1]}} </td>
-        <td> {{selected_product[2]}}kcal </td>
-        <td> {{selected_product[3]}}g </td>
-        <td> {{selected_product[4]}}g </td>
-        <td> {{selected_product[5]}}g </td>
-        <td> {{selected_product[6]}}g </td>
-    </tr>
-</table>
+{% if selected_product is defined %}
 
 <form action=/addmeal method="post">
-<div class="m-3 p-2 bg-body-secondary rounded-2">
+<div class="m-3 p-1 bg-body-secondary rounded-2 justify-content-center">
 <div class="row m-1 g-3 align-items-center">
-    <div class="col-2">
-        <label class="col-form-label" for="product_name"> Selected product: </label>
-    </div>
     <div class="col">
-        <input class="form-control" readonly autocomplete="off" type="text" id="product_name" name="product_name" value="{{selected_product[1]}}">
+        <p>{{selected_product[1]}}</p>
+    </div>
+</div>
+<div class="row g-1">
+    <div class="col-3">
+        <div class="text-bg-secondary rounded-1">kcal/100g</div>
+    </div>
+    <div class="col-3">
+        <div class="text-bg-secondary rounded-1">Fats</div>
+    </div>
+    <div class="col-3">
+        <div class="text-bg-secondary rounded-1">Carbs</div>
+    </div>
+    <div class="col-3">
+        <div class="text-bg-secondary rounded-1">Proteins</div>
+    </div>
+</div>
+<div class="row g-1">
+    <div class="col-3">
+        <div class="text-bg-light rounded-1">{{selected_product[2]}}kcal</div>
+    </div>
+    <div class="col-3">
+        <div class="text-bg-light rounded-1">{{selected_product[3]}}g</div>
+    </div>
+    <div class="col-3">
+        <div class="text-bg-light rounded-1">{{selected_product[4]}}g</div>
+    </div>
+    <div class="col-3">
+        <div class="text-bg-light rounded-1">{{selected_product[5]}}g</div>
     </div>
 </div>
 <div class="row m-1 g-3 align-items-center">
@@ -67,11 +68,13 @@
     </div>
 </div>
 <div class="row m-1 g-3 align-items-center">
-    <div class="col-2">
-        <label class="col-form-label" for="weight"> Weight: </label>
-    </div>
     <div class="col">
-        <input class="form-control" autocomplete="off" autofocus="on" type="number" step="0.1" name="weight" id="weight" min="0.0">
+        <input class="form-control" name="meal_calories_indicator" id="meal_calories_indicator" type="text" placeholder="Resulting calories (kcal)" disabled>
+    </div>
+</div>
+<div class="row m-1 g-3 align-items-center">
+    <div class="col">
+        <input class="form-control" autocomplete="off" autofocus="on" type="number" step="0.1" name="weight" id="weight" min="0.0" placeholder="Weight (g)">
     </div>
     <div class="col">
         <button class="btn btn-primary" type="submit">Add meal</button>
@@ -79,5 +82,13 @@
 </div>
 </div>
 </form>
+<script>
+    let meal_calories = 0.0;
+    document.getElementById("weight").oninput = function(){
+        meal_calories = {{selected_product[2]}}/100.0 * document.getElementById("weight").value;
+        meal_calories = meal_calories.toFixed(2);
+        document.getElementById("meal_calories_indicator").value = meal_calories + "kcal";
+    };
+</script>
 {% endif %}
 {% endblock %}
