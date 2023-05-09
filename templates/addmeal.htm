@@ -2,38 +2,43 @@
 {% block body %}
 <h2>Add meal</h2>
 
-<form action=/scanbarcode method="get">
+<form action=/scanbarcode method="get" id="add_by_barcode">
     <input type="hidden" id="barcode_request_origin" name="barcode_request_origin" value="addmeal">
-    <button class="btn btn-primary" type="submit">Scan Barcode</button>
 </form>
-<form action="/addmeal" method="get">
-<div class="m-1 p-1 container bg-body-secondary rounded-2">
-    <div class="row g-3">
-        <div class="col">
+
+<div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
+    <div class="row g-1 align-items-center">
+        <div class="col-8">
+            <form action="/addmeal" method="get" id="add_by_text">
             <input class="form-control" list="product_options" name="product" id="product" placeholder="Find product...">
-        <datalist id="product_options">
-            {% for product in products %}
-                <option>{{product[1]}}</option>
-            {% endfor %}
-        </datalist>
+            <datalist id="product_options">
+                {% for product in products %}
+                    <option>{{product[1]}}</option>
+                {% endfor %}
+            </datalist>
+            </form>
         </div>
-        <div class="col">
-            <button class="btn btn-primary" type="submit">Show product</button>
+        <div class="col-2">
+            <button class="btn btn-primary" form="add_by_text" type="submit">Select</button>
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary" form="add_by_barcode" type="submit">Scan</button>
+        </div>
         </div>
     </div>
 </div>  
-</form>
+
 
 {% if selected_product is defined %}
 
 <form action=/addmeal method="post">
-<div class="m-1 p-1 container bg-body-secondary rounded-2">
-    <div class="row g-3">
+<div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
+    <div class="row g-1">
         <div class="col-12">
             <input class="form-control-plaintext text-center" type="text" id="product_name" name="product_name" value="{{selected_product[1]}}">
         </div>
     </div>
-    <div class="row g-3">
+    <div class="row g-1 justify-content-center text-center">
         <div class="col-3">
             <div class="text-bg-secondary rounded-1">kcal/100g</div>
         </div>
@@ -47,7 +52,7 @@
             <div class="text-bg-secondary rounded-1">Proteins</div>
         </div>
     </div>
-    <div class="row g-3">
+    <div class="row g-1 justify-content-center text-center">
         <div class="col-3">
             <div class="text-bg-light rounded-1">{{selected_product[2]}}kcal</div>
         </div>
@@ -61,7 +66,7 @@
             <div class="text-bg-light rounded-1">{{selected_product[5]}}g</div>
         </div>
     </div>
-    <div class="row g-3  mt-1">
+    <div class="row g-1 mt-1">
         <div class="col-2">
             <label class="col-form-label" for="date"> Date: </label>
         </div>
@@ -69,12 +74,12 @@
             <input class="form-control" autocomplete="off" type="date" id="date" name="date" value="{{todays_date}}">
         </div>
     </div>
-    <div class="row g-3 mt-1">
+    <div class="row g-1 mt-1">
         <div class="col">
             <input class="form-control" name="meal_calories_indicator" id="meal_calories_indicator" type="text" placeholder="Resulting calories (kcal)" disabled>
         </div>
     </div>
-    <div class="row g-3 mt-1">
+    <div class="row g-1 mt-1">
         <div class="col">
             <input class="form-control" autocomplete="off" autofocus="on" type="number" step="0.1" name="weight" id="weight" min="0.0" placeholder="Weight (g)">
         </div>

@@ -8,12 +8,31 @@
 	</head>
 	<body>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-		<div class="container text-center m-2 mx-auto">
-			<a class="btn btn-primary" role="button" href="/">Summary</a>
-			<a class="btn btn-primary" role="button" href="/addmeal">Add meal</a>
-			<a class="btn btn-primary" role="button" href="/addproduct">Add new product </a>
-			<a class="btn btn-primary" role="button" href="/browsedatabase">Browse database</a>
-			<a class="btn btn-primary" role="button" href="/logout">Logout/Login</a>
+		<nav class="navbar fixed-top bg-body">
+			<div class="container-fluid bg-white">
+				<a class="navbar-brand" href="/">Calorie Counter</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				  <span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse justify-content-center text-center mx mx-auto" id="navbarNav">
+					<ul class="navbar-nav mt-2 bg-primary-subtle p-3 rounded-2">
+					<li class="nav-item">
+						<a class="nav-link" href="/addmeal">Add meal</a>
+					</li>
+					<li class="nav-item">	
+						<a class="nav-link" href="/addproduct">Add product </a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/browsedatabase">Show products</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/logout">Logout</a>
+					</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="container text-center mt-5 pt-2 mx-auto">
 		{% block body %}{% endblock %}
 		</div>
 	</body>

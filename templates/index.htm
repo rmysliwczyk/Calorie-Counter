@@ -1,7 +1,6 @@
 {% extends "layout.htm" %}
 {% block body %}
-<h2 class="pt-5">Summary</h2>
-<div class="badge bg-primary text-wrap"><p class="h5">CALORIE TOTAL: {{calorie_total}}</p></div>
+<h2>Summary</h2>
     <table class="table">
         <tr>
             <th> Product: </th>
@@ -25,4 +24,10 @@
     </div>
     <button class="btn btn-primary" type="submit">Show selected date</button>
 </form>
+
+<nav class="navbar fixed-bottom bg-primary-subtle">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Calories total: {{calorie_total}}</a>
+    </div>
+  </nav>
 {% endblock %}
