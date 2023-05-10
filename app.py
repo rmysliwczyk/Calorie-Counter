@@ -17,15 +17,8 @@ Session(app)
 con = sqlite3.connect("caloriecounter.db", check_same_thread=False)
 cur = con.cursor()
 
-@app.route("/", methods=["GET", "POST"])
-@login_required
-def index():
-    if request.method == "POST":
-        cur.execute("DELETE FROM meals WHERE id=?", (request.form.get("meal_to_delete"),))
-        con.commit()
+def calculate_calories(selected_date):
     session["calories_today"] = 0
-    selected_date = request.args.get("selected_date")
-
     if not selected_date:
         selected_date = date.today()
 
@@ -35,6 +28,20 @@ def index():
 
         if str(result[1]) == str(selected_date):
          session["calories_today"] = round(session["calories_today"] + result[5], 2)
+
+@app.route("/", methods=["GET", "POST"])
+@login_required
+def index():
+    if request.method == "POST":
+        cur.execute("DELETE FROM meals WHERE id=?", (request.form.get("meal_to_delete"),))
+        con.commit()
+    selected_date = request.args.get("selected_date")
+    if not selected_date:
+        selected_date = date.today()
+
+    calculate_calories(selected_date)
+    res = cur.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
+    res = res.fetchall()
 
     return render_template("index.htm", meals=res, calorie_total=session["calories_today"], selected_date=selected_date)
 
@@ -105,6 +112,7 @@ def browsedatabase():
 @app.route("/addmeal", methods=["GET", "POST"])
 @login_required
 def addmeal():
+    calculate_calories(date.today())
     if request.method == "GET":
         product_name = request.args.get("product")
         barcode = session.get("barcode")
@@ -112,16 +120,16 @@ def addmeal():
         if barcode:
             res = cur.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
             res = res.fetchone()
-            return render_template("addmeal.htm", selected_product=res, todays_date = date.today())
+            return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"])
         elif not product_name:
             res = cur.execute("SELECT * FROM products")
             res = res.fetchall()
-            return render_template("addmeal.htm", products=res)
+            return render_template("addmeal.htm", products=res, calories_today=session["calories_today"])
         else:
             product_name = product_name.strip()
             res = cur.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
             res = res.fetchone()
-            return render_template("addmeal.htm", selected_product=res, todays_date = date.today())
+            return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"])
     else:
         meal_date = request.form.get("date")
         if not meal_date:
