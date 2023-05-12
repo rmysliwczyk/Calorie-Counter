@@ -24,17 +24,17 @@
                     {% for meal in meals %}
                         {% if meal[6] == meal_time %}
                         <div class="container justify-content-center">
-                            <div class="row mt-2">
-                                <div class="col">
+                            <div class="row mt-2 g-1">
+                                <div class="col-6">
                                     {{meal[3]}} 
                                 </div>
-                                <div class="col">
+                                <div class="col-2">
                                     {{meal[4]}}g
                                 </div>
-                                <div class="col">
+                                <div class="col-2">
                                     {{meal[5]}}kcal 
                                 </div>
-                                <div class="col">
+                                <div class="col-2">
                                     <form action="/" method="post"> <button class="btn-close" id="meal_to_delete" name="meal_to_delete" value="{{meal[0]}}"></button></form>
                                 </div>
                             </div>
