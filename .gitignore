@@ -1,5 +1,9 @@
 flask_session/
-__pycache_
+__pycache__
 cert.pem
 key.pem
 caloriecounter.db
+calorie_counter.ini
+calorie_counter.sock
+.venv
+wsgi.py
