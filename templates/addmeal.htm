@@ -39,6 +39,11 @@
 <form action=/addmeal method="post">
 <div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
     <div class="row g-1">
+        <div class="col">
+            <input class="form-control-plaintext text-center" type="text" id="meal_time" name="meal_time" value="{% if meal_time %}{{meal_time}}{% else %}Breakfast{% endif %}">
+        </div>
+    </div>
+    <div class="row g-1">
         <div class="col-2">
             <label class="col-form-label" for="date"> Date: </label>
         </div>

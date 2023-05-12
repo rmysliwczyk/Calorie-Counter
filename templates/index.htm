@@ -1,22 +1,53 @@
 {% extends "layout.htm" %}
 {% block body %}
 <h2>Summary</h2>
-    <table class="table">
-        <tr>
-            <th> Product: </th>
-            <th> Weight: </th>
-            <th> Calories: </th>
-            <th> Delete meal: </th>
-        </tr>
-{% for meal in meals %}
-        <tr>
-            <td> {{meal[3]}} </td>
-            <td> {{meal[4]}} </td>
-            <td> {{meal[5]}} </td>
-            <td> <form action="/" method="post"> <button class="btn-close" id="meal_to_delete" name="meal_to_delete" value="{{meal[0]}}"></button> </form> </td>
-        </tr>
-{% endfor %}
-</table>
+
+
+<div class="accordion accordion-flush" id="meal_times">
+    {% for meal_time in meal_times %}
+    <div class="accordion-item">
+        <div class="row align-items-center">
+            <div class="col-10">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{meal_time}}" aria-expanded="false" aria-controls="{{meal_time}}">
+                        {{meal_time}}<br/>
+                    </button>
+                </h2>
+            </div>
+            <div class="col-1">
+                <a class="btn btn-primary rounded-5 text-center align-items-center" role="button" href="/addmeal?meal_time={{meal_time}}">+</a>
+            </div>
+        </div>
+
+        <div id="{{meal_time}}" class="accordion-collapse collapse" data-bs-parent="#meal_times">
+            <div class="accordion-body">      
+                    {% for meal in meals %}
+                        {% if meal[6] == meal_time %}
+                        <div class="container">
+                            <div class="row mt-2">
+                                <div class="col">
+                                    {{meal[3]}} 
+                                </div>
+                                <div class="col">
+                                    {{meal[4]}}g
+                                </div>
+                                <div class="col">
+                                    {{meal[5]}}kcal 
+                                </div>
+                                <div class="col">
+                                    <form action="/" method="post"> <button class="btn-close" id="meal_to_delete" name="meal_to_delete" value="{{meal[0]}}"></button></form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
 <form action="/" method="get">
     <div class="m-3 p-3 bg-body-secondary rounded-2">
         <label class="form-label" for="selected_date">Select different date:</label>

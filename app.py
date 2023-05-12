@@ -43,7 +43,13 @@ def index():
     res = cur.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
     res = res.fetchall()
 
-    return render_template("index.htm", meals=res, calorie_total=session["calories_today"], selected_date=selected_date)
+    meal_times = ["Breakfast", "Lunch", "Dinner"]
+
+    for meal in res:
+        if meal[6] not in meal_times:
+            meal_times.append(meal[6])
+
+    return render_template("index.htm", meals=res, calorie_total=session["calories_today"], selected_date=selected_date, meal_times=meal_times)
 
 @app.route("/logout")
 def logout():
@@ -114,13 +120,17 @@ def browsedatabase():
 def addmeal():
     calculate_calories(date.today())
     if request.method == "GET":
+        if request.args.get("meal_time"):
+            session["which_meal_time_to_add"] = request.args.get("meal_time")
+
         product_name = request.args.get("product")
         barcode = session.get("barcode")
         session["barcode"] = None
+
         if barcode:
             res = cur.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
             res = res.fetchone()
-            return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"])
+            return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
         elif not product_name:
             res = cur.execute("SELECT * FROM products")
             res = res.fetchall()
@@ -129,7 +139,7 @@ def addmeal():
             product_name = product_name.strip()
             res = cur.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
             res = res.fetchone()
-            return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"])
+            return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
     else:
         meal_date = request.form.get("date")
         if not meal_date:
@@ -145,7 +155,7 @@ def addmeal():
             res = res.fetchone()
             session["new_meal_calories"] = round(float(res[2]/100.0) * float(meal_weight), 2)
 
-            cur.execute("INSERT INTO meals (date, username, product_name, weight, calories) VALUES (?,?,?,?,?)", (meal_date, session["user"], product_name, meal_weight, session["new_meal_calories"]))
+            cur.execute("INSERT INTO meals (date, username, product_name, weight, calories, meal_time) VALUES (?,?,?,?,?,?)", (meal_date, session["user"], product_name, meal_weight, session["new_meal_calories"], session["which_meal_time_to_add"]))
             con.commit()
             return redirect("/")
 
