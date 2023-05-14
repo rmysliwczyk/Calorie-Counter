@@ -43,11 +43,26 @@ def index():
     res = cur.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
     res = res.fetchall()
 
-    meal_times = ["Breakfast", "Lunch", "Dinner"]
+    #First item of the inner list element represents the meal time, second one, total calories for the meal time.
+    meal_times = [
+        {"meal_time_name":"Breakfast", "meal_time_calories":0}, 
+        {"meal_time_name":"Lunch", "meal_time_calories":0},
+        {"meal_time_name":"Dinner", "meal_time_calories":0}
+        ]
 
+    meal_time_exists = False
     for meal in res:
-        if meal[6] not in meal_times:
-            meal_times.append(meal[6])
+        for meal_time in meal_times:
+            if meal[6] == meal_time["meal_time_name"]:
+                meal_time_exists = True
+        if meal_time_exists == False:                 
+            meal_times.append({"meal_time_name":meal[6], "meal_time_calories": 0})
+    
+    for meal in res:
+        for meal_time in meal_times:
+            if meal[6] == meal_time["meal_time_name"]:
+                meal_time["meal_time_calories"] += meal[5]
+
 
     return render_template("index.htm", meals=res, calorie_total=session["calories_today"], selected_date=selected_date, meal_times=meal_times)
 
