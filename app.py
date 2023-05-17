@@ -29,6 +29,7 @@ def calculate_calories(selected_date):
         if str(result[1]) == str(selected_date):
          session["calories_today"] = round(session["calories_today"] + result[5], 2)
 
+
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
@@ -61,15 +62,16 @@ def index():
     for meal in res:
         for meal_time in meal_times:
             if meal[6] == meal_time["meal_time_name"]:
-                meal_time["meal_time_calories"] += meal[5]
-
+                meal_time["meal_time_calories"] = round(meal_time["meal_time_calories"] + meal[5], 2)
 
     return render_template("index.htm", meals=res, calorie_total=session["calories_today"], selected_date=selected_date, meal_times=meal_times)
+
 
 @app.route("/logout")
 def logout():
     session["user"] = None
     return redirect("/login")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -97,6 +99,7 @@ def login():
 
     session["user"] = username
     return redirect("/")
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -129,6 +132,7 @@ def browsedatabase():
     res = cur.execute("SELECT * FROM products ORDER BY product_name ASC")
     res = res.fetchall()
     return render_template("browsedatabase.htm", products=res)
+
 
 @app.route("/addmeal", methods=["GET", "POST"])
 @login_required
@@ -204,6 +208,7 @@ def addproduct():
         
         return handle_error("Couldn't add product to database")
 
+
 @app.route("/scanbarcode", methods=["GET", "POST"])
 @login_required
 def scanbarcode():
@@ -219,6 +224,7 @@ def scanbarcode():
 def handle_error(error_message):
     print(error_message)
     return redirect("/")
+
 
 if __name__ == ("__main__"):
     app.run()
