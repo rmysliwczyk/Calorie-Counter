@@ -1,6 +1,3 @@
-# TODO:
-# Store information about current logged in user in a session token
-
 from flask import *
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -16,6 +13,7 @@ Session(app)
 
 con = sqlite3.connect("caloriecounter.db", check_same_thread=False)
 cur = con.cursor()
+
 
 def calculate_calories(selected_date):
     session["calories_today"] = 0
@@ -70,7 +68,7 @@ def index():
 @app.route("/logout")
 def logout():
     session["user"] = None
-    return redirect("/login")
+    return redirect(url_for("login"))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -98,7 +96,7 @@ def login():
         return handle_error("Incorrect password")
 
     session["user"] = username
-    return redirect("/")
+    return redirect(url_for("index"))
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -119,7 +117,7 @@ def register():
 
     cur.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (username, generate_password_hash(password)))
     con.commit()
-    return redirect("/login")
+    return redirect(url_for("login"))
 
 
 @app.route("/browsedatabase", methods=["GET", "POST"])
@@ -176,7 +174,7 @@ def addmeal():
 
             cur.execute("INSERT INTO meals (date, username, product_name, weight, calories, meal_time) VALUES (?,?,?,?,?,?)", (meal_date, session["user"], product_name, meal_weight, session["new_meal_calories"], session["which_meal_time_to_add"]))
             con.commit()
-            return redirect("/")
+            return redirect(url_for("index"))
 
 
 @app.route("/addproduct", methods=["GET", "POST"])
@@ -215,15 +213,15 @@ def scanbarcode():
     if request.method == "POST":
         session["barcode"] = request.form.get("barcode")
         if request.form.get("barcode_request_origin") == "addproduct":
-            return redirect("/addproduct")
+            return redirect(url_for("addproduct"))
         elif request.form.get("barcode_request_origin") == "addmeal":
-            return redirect("/addmeal")
+            return redirect(url_for("addmeal"))
     return render_template("scanbarcode.htm", barcode_request_origin=request.args.get("barcode_request_origin"))
 
 
 def handle_error(error_message):
     print(error_message)
-    return redirect("/")
+    return redirect(url_for("index"))
 
 
 if __name__ == ("__main__"):
