@@ -4,7 +4,7 @@
 <!-- The functionality of scanning the barcodes is provided by https://github.com/mebjas/html5-qrcode -->
 <div id="reader"></div>
 
-<form action="/scanbarcode" method="post" id="barcode_form">
+<form action="{{url_for('scanbarcode')}}" method="post" id="barcode_form">
     <input type="hidden" id="barcode_request_origin" name="barcode_request_origin" value="{{barcode_request_origin}}">
     <input class="form-control" type="text" id="barcode" name="barcode" value="">
 </form>

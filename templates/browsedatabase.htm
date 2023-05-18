@@ -19,7 +19,7 @@
         <td> {{product[3]}}g </td>
         <td> {{product[4]}}g </td>
         <td> {{product[5]}}g </td>
-        <td><form action="/browsedatabase" method="post"><button class="btn-close" id="product_to_delete" name="product_to_delete" value="{{product[0]}}"></button></form></td>
+        <td><form action="{{url_for('browsedatabase')}}" method="post"><button class="btn-close" id="product_to_delete" name="product_to_delete" value="{{product[0]}}"></button></form></td>
     </tr>
 
 {% endfor %}
