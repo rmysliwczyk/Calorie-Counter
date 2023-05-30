@@ -156,6 +156,10 @@ def addmeal():
             product_name = product_name.strip()
             res = cur.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
             res = res.fetchone()
+            print(res)
+            if res is None:
+                # Product not found in database
+                return redirect(url_for("addproduct", message="Product not found"))
             return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
     else:
         meal_date = request.form.get("date")
@@ -182,8 +186,9 @@ def addmeal():
 def addproduct():
     if request.method == "GET":
         barcode = session.get("barcode")
+        message = request.args.get("message")
         session["barcode"] = None
-        return render_template("addproduct.htm", barcode=barcode)
+        return render_template("addproduct.htm", barcode=barcode, message=message)
     else:
         product_name = request.form.get("product_name").strip()
         calories = request.form.get("calories")
