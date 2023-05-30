@@ -147,6 +147,9 @@ def addmeal():
         if barcode:
             res = cur.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
             res = res.fetchone()
+            if res is None:
+                # Product not found in database
+                return redirect(url_for("addproduct", message="Product not found"))
             return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
         elif not product_name:
             res = cur.execute("SELECT * FROM products")
