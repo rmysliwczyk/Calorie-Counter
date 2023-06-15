@@ -2,6 +2,10 @@
 {% block title %}Browse products database{% endblock %}
 {% block body %}
 <h2>Browse database</h2>
+<form id="search_form">
+    <input class="form-control" type="search" id="search_field" name="search_field">
+</form>
+
 <table class="table">
     <tr>
         <th> Product: </th>
@@ -25,4 +29,11 @@
 {% endfor %}
 </table>
 
+
+<script>
+    document.getElementById("search_field").oninput( function()
+    {
+        document.getElementById("search_form").submit()
+    });
+</script>
 {% endblock %}

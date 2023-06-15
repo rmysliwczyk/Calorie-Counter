@@ -127,8 +127,13 @@ def browsedatabase():
         cur.execute("DELETE FROM products WHERE id=?",(request.form.get("product_to_delete"),))
         con.commit()
 
-    res = cur.execute("SELECT * FROM products ORDER BY product_name ASC")
+    search_string = request.args.get("search_field")
+    if not search_string:
+        search_string = ""
+    print(search_string)
+    res = cur.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + search_string + "%",))
     res = res.fetchall()
+    print(res)
     return render_template("browsedatabase.htm", products=res)
 
 
