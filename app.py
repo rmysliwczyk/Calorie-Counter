@@ -148,6 +148,12 @@ def addmeal():
         product_name = request.args.get("product")
         barcode = session.get("barcode")
         session["barcode"] = None
+        product_from_list = request.args.get("product_from_list")
+
+        if product_from_list:
+            res = cur.execute("SELECT * FROM products WHERE id = ?", (product_from_list,))
+            res = res.fetchone()
+            return render_template("addmeal.htm", selected_product=res, todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
 
         if barcode:
             res = cur.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
@@ -156,19 +162,13 @@ def addmeal():
                 # Product not found in database
                 return redirect(url_for("addproduct", message="Product not found"))
             return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
-        elif not product_name:
-            res = cur.execute("SELECT * FROM products")
-            res = res.fetchall()
-            return render_template("addmeal.htm", products=res, calories_today=session["calories_today"])
-        else:
+        elif product_name:
             product_name = product_name.strip()
-            res = cur.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
-            res = res.fetchone()
-            print(res)
-            if res is None:
-                # Product not found in database
-                return redirect(url_for("addproduct", message="Product not found"))
-            return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
+            res = cur.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + product_name + "%",))
+            res = res.fetchall()
+            return render_template("addmeal.htm", product_list=res, todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
+        else:
+            return render_template("addmeal.htm", todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
     else:
         meal_date = request.form.get("date")
         if not meal_date:

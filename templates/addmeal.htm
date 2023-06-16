@@ -10,12 +10,7 @@
     <div class="row g-1 align-items-center justify-content-center">
         <div class="col-6">
             <form action="{{url_for('addmeal')}}" method="get" id="add_by_text">
-            <input class="form-control" list="product_options" name="product" id="product" placeholder="Find product...">
-            <datalist id="product_options">
-                {% for product in products %}
-                    <option>{{product[1]}}</option>
-                {% endfor %}
-            </datalist>
+                <input class="form-control" type="search" name="product" id="product" autocomplete="off" placeholder="Find product...">
             </form>
         </div>
         <div class="col-3">
@@ -27,12 +22,19 @@
         </div>
 </div>
 
-
-<nav class="navbar fixed-bottom mt-5 bg-primary-subtle">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Calories today: {{calories_today}}</a>
+{% if product_list is defined %}
+<form id="product_selection">
+    <div>
+        {% for product in product_list %}
+            <div class="row">
+                <div class="col">
+                    <button class="btn" type="submit" name="product_from_list" id="product_from_list" value="{{product[0]}}">{{product[1]}}</button>
+                </div>
+            </div>
+        {% endfor %}
     </div>
-</nav>
+</form>
+{% endif %}
 
 {% if selected_product is defined %}
 
@@ -108,4 +110,16 @@
     };
 </script>
 {% endif %}
+
+<nav class="navbar fixed-bottom mt-5 bg-primary-subtle">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Calories today: {{calories_today}}</a>
+    </div>
+</nav>
+
+<script>
+    document.getElementById("product").oninput(function(){
+        docment.getElementById("add_by_text").submit()
+    })
+</script>
 {% endblock %}
