@@ -166,7 +166,7 @@ def addmeal():
             product_name = product_name.strip()
             res = cur.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + product_name + "%",))
             res = res.fetchall()
-            return render_template("addmeal.htm", product_list=res, todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
+            return render_template("addmeal.htm", product_list=res, todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"], entered_string=product_name)
         else:
             return render_template("addmeal.htm", todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
     else:
