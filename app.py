@@ -12,8 +12,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 con = sqlite3.connect("caloriecounter.db", check_same_thread=False)
-cur = con.cursor()
-
+con.execute("PRAGMA foreign_keys = ON")
 
 def calculate_calories(selected_date):
     session["calories_today"] = 0
@@ -198,6 +197,10 @@ def addmeal():
 
             return redirect(url_for("index"))
 
+@app.route("/addrecipe", methods=["GET", "POST"])
+@login_required
+def addrecipe():
+    return render_template("addrecipe.htm")
 
 @app.route("/addproduct", methods=["GET", "POST"])
 @login_required

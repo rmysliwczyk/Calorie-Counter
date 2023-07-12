@@ -1,0 +1,64 @@
+{% extends "layout.htm" %}
+{% block body %}
+<h2>Add recipe</h2>
+
+<form action="{{url_for('addrecipe')}}" method="get">
+<div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
+    <div class="row g-1">
+        <div class="col-12">
+            <input class="form-control text-center" type="text" id="recipe_name" name="recipe_name" placeholder="Recipe name" autocomplete="off">
+        </div>
+    </div>
+    <div class="row g-1 justify-content-center text-center mt-1">
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">kcal/100g</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">Fats</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">Carbs</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">Proteins</div>
+        </div>
+    </div>
+    <div class="row g-1 justify-content-center text-center">
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">kcal</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">g</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">g</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">g</div>
+        </div>
+    </div>
+    <div class="row g-1 mt-1">
+        <div class="col">
+            <button class="btn btn-primary" type="submit">Add recipe</button>
+        </div>
+    </div>
+</div>
+</form>
+
+<form action="{{url_for('addrecipe')}}" method="post">
+    <div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
+        <div class="row g-1">
+            <div class="col">
+                <button class="btn btn-primary" type="submit">Add ingredient</button>
+            </div>
+        </div>
+    </div>
+</form>
+</form>
+<nav class="navbar fixed-bottom mt-5 bg-primary-subtle">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Calories today: {{calories_today}}</a>
+    </div>
+</nav>
+
+{% endblock %}
