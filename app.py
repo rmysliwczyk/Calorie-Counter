@@ -20,7 +20,8 @@ def calculate_calories(selected_date):
     if not selected_date:
         selected_date = date.today()
 
-    res = cur.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
+    with con:
+    res = con.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
     res = res.fetchall()
     for result in res:
 
@@ -124,16 +125,16 @@ def register():
 @login_required
 def browsedatabase():
     if request.method == "POST":
-        cur.execute("DELETE FROM products WHERE id=?",(request.form.get("product_to_delete"),))
-        con.commit()
+        with con:
+            con.execute("DELETE FROM products WHERE id=?",(request.form.get("product_to_delete"),))
 
     search_string = request.args.get("search_field")
     if not search_string:
         search_string = ""
-    print(search_string)
-    res = cur.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + search_string + "%",))
-    res = res.fetchall()
-    print(res)
+
+    with con:
+        res = con.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + search_string + "%",))
+        res = res.fetchall()
     return render_template("browsedatabase.htm", products=res)
 
 
