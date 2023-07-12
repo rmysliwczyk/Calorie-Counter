@@ -21,8 +21,8 @@ def calculate_calories(selected_date):
         selected_date = date.today()
 
     with con:
-    res = con.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
-    res = res.fetchall()
+        res = con.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
+        res = res.fetchall()
     for result in res:
 
         if str(result[1]) == str(selected_date):
@@ -33,15 +33,16 @@ def calculate_calories(selected_date):
 @login_required
 def index():
     if request.method == "POST":
-        cur.execute("DELETE FROM meals WHERE id=?", (request.form.get("meal_to_delete"),))
-        con.commit()
+        with con:
+            con.execute("DELETE FROM meals WHERE id=?", (request.form.get("meal_to_delete"),))
     selected_date = request.args.get("selected_date")
     if not selected_date:
         selected_date = date.today()
 
     calculate_calories(selected_date)
-    res = cur.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
-    res = res.fetchall()
+    with con:
+        res = con.execute("SELECT * FROM meals WHERE date=? AND username=?", (selected_date, session["user"]))
+        res = res.fetchall()
 
     #First item of the inner list element represents the meal time, second one, total calories for the meal time.
     meal_times = [
@@ -82,16 +83,18 @@ def login():
     if not username:
         return handle_error("Username can't be empty")
 
-    username_from_db = cur.execute("SELECT username FROM users WHERE username = ?", (username,))
-    username_from_db = username_from_db.fetchone()
+    with con:
+        username_from_db = con.execute("SELECT username FROM users WHERE username = ?", (username,))
+        username_from_db = username_from_db.fetchone()
     if not username_from_db:
         return handle_error("Username does not exist")
     
     if not password:
         return handle_error("Password can't be empty")
 
-    password_hash = cur.execute("SELECT hash FROM users WHERE username = ?", (username,))
-    password_hash = password_hash.fetchone()[0]
+    with con:
+        password_hash = con.execute("SELECT hash FROM users WHERE username = ?", (username,))
+        password_hash = password_hash.fetchone()[0]
 
     if not check_password_hash(password_hash, password):
         return handle_error("Incorrect password")
@@ -110,14 +113,16 @@ def register():
     if not username:
         return handle_error("Username can't be empty")
 
-    if not cur.execute("SELECT username FROM users WHERE username = ?", (username,)):
-        return handle_error("Username already exists")
+    with con:
+        if not con.execute("SELECT username FROM users WHERE username = ?", (username,)):
+            return handle_error("Username already exists")
     
     if not password:
         return handle_error("Password can't be empty")
 
-    cur.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (username, generate_password_hash(password)))
-    con.commit()
+    with con:
+        con.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (username, generate_password_hash(password)))
+
     return redirect(url_for("login"))
 
 
@@ -152,21 +157,24 @@ def addmeal():
         product_from_list = request.args.get("product_from_list")
 
         if product_from_list:
-            res = cur.execute("SELECT * FROM products WHERE id = ?", (product_from_list,))
-            res = res.fetchone()
+            with con:
+                res = con.execute("SELECT * FROM products WHERE id = ?", (product_from_list,))
+                res = res.fetchone()
             return render_template("addmeal.htm", selected_product=res, todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
 
         if barcode:
-            res = cur.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
-            res = res.fetchone()
+            with con:
+                res = con.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
+                res = res.fetchone()
             if res is None:
                 # Product not found in database
                 return redirect(url_for("addproduct", message="Product not found"))
             return render_template("addmeal.htm", selected_product=res, todays_date = date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
         elif product_name:
             product_name = product_name.strip()
-            res = cur.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + product_name + "%",))
-            res = res.fetchall()
+            with con:
+                res = con.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + product_name + "%",))
+                res = res.fetchall()
             return render_template("addmeal.htm", product_list=res, todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"], entered_string=product_name)
         else:
             return render_template("addmeal.htm", todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"])
@@ -180,13 +188,14 @@ def addmeal():
         if not product_name or not meal_date or not meal_weight:
             return handle_error("Missing required fields")
         else:
-
-            res = cur.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
-            res = res.fetchone()
+            with con:
+                res = con.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
+                res = res.fetchone()
             session["new_meal_calories"] = round(float(res[2]/100.0) * float(meal_weight), 2)
 
-            cur.execute("INSERT INTO meals (date, username, product_name, weight, calories, meal_time) VALUES (?,?,?,?,?,?)", (meal_date, session["user"], product_name, meal_weight, session["new_meal_calories"], session["which_meal_time_to_add"]))
-            con.commit()
+            with con:
+                con.execute("INSERT INTO meals (date, username, product_name, weight, calories, meal_time) VALUES (?,?,?,?,?,?)", (meal_date, session["user"], product_name, meal_weight, session["new_meal_calories"], session["which_meal_time_to_add"]))
+
             return redirect(url_for("index"))
 
 
@@ -212,10 +221,10 @@ def addproduct():
         elif (float(fats) < 0 or float(carbohydrates) < 0 or float(proteins) < 0 or float(calories) < 0):
             return handle_error("Value cannot be less than zero")
         else:
-            cur.execute(
-            "INSERT INTO products (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode) VALUES (?,?,?,?,?,?,?) ",
-            (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode_post))
-            con.commit()
+            with con:
+                con.execute(
+                "INSERT INTO products (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode) VALUES (?,?,?,?,?,?,?) ",
+                (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode_post))
             return render_template("addproduct.htm")
         
         return handle_error("Couldn't add product to database")
