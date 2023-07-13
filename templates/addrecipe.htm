@@ -45,16 +45,26 @@
 </div>
 </form>
 
-<form action="{{url_for('addrecipe')}}" method="post">
-    <div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
-        <div class="row g-1">
-            <div class="col">
-                <button class="btn btn-primary" type="submit">Add ingredient</button>
-            </div>
+<div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
+    <div class="row g-1">
+        <div class="col">
+            <a href="{{url_for('addingredient')}}" class="btn btn-primary">Add ingredient</a>
         </div>
     </div>
-</form>
-</form>
+    {% for ingredient in ingredients %}
+    <div class="row g-1 mt-1">
+        <div class="col">
+            {{ingredient["product_name"]}}
+        </div>
+        <div class="col">
+            Weight: {{ingredient["weight"]}}
+        </div>
+        <div class="col">
+            Calories: {{ingredient["calories"]}}
+        </div>
+    </div>
+    {% endfor %}
+</div>
 <nav class="navbar fixed-bottom mt-5 bg-primary-subtle">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Calories today: {{calories_today}}</a>

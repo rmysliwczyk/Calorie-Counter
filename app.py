@@ -197,10 +197,67 @@ def addmeal():
 
             return redirect(url_for("index"))
 
+@app.route("/addingredient", methods=["GET", "POST"])
+@login_required
+def addingredient():
+    calculate_calories(date.today())
+    if request.method == "GET":
+
+        product_name = request.args.get("product")
+        barcode = session.get("barcode")
+        session["barcode"] = None
+        product_from_list = request.args.get("product_from_list")
+
+        if product_from_list:
+            with con:
+                res = con.execute("SELECT * FROM products WHERE id = ?", (product_from_list,))
+                res = res.fetchone()
+            return render_template("addingredient.htm", selected_product=res, calories_today=session["calories_today"])
+
+        if barcode:
+            with con:
+                res = con.execute("SELECT * FROM products WHERE barcode=?", (barcode,))
+                res = res.fetchone()
+            if res is None:
+                # Product not found in database
+                return redirect(url_for("addproduct", message="Product not found"))
+            return render_template("addingredient.htm", selected_product=res, calories_today=session["calories_today"])
+        elif product_name:
+            product_name = product_name.strip()
+            with con:
+                res = con.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + product_name + "%",))
+                res = res.fetchall()
+            return render_template("addingredient.htm", product_list=res, calories_today=session["calories_today"], entered_string=product_name)
+        else:
+            return render_template("addingredient.htm", calories_today=session["calories_today"])
+    else:
+        product_name = request.form.get("product_name")
+        meal_weight = request.form.get("weight")
+        if not product_name or not meal_weight:
+            return handle_error("Missing required fields")
+        else:
+            with con:
+                res = con.execute("SELECT * FROM products WHERE product_name=?", (product_name,))
+                res = res.fetchone()
+            if not session.get("ingredients"):
+                session["ingredients"] = []
+            session["ingredients"].append({res[0]:{"calories": round(float(res[2]/100.0) * float(meal_weight), 2), "weight": meal_weight}})
+
+            return redirect(url_for("addrecipe"))
+
 @app.route("/addrecipe", methods=["GET", "POST"])
 @login_required
 def addrecipe():
-    return render_template("addrecipe.htm")
+    ingredients = []
+    with con:
+        if session.get("ingredients"):
+            for ingredient in session["ingredients"]:
+                for k, v in ingredient.items():
+                    res = con.execute("SELECT product_name FROM products WHERE id=?", (k,))
+                    res = res.fetchone()
+                    ingredients.append({"product_name": res[0], "weight": v["weight"], "calories": v["calories"]})
+    print(ingredients)
+    return render_template("addrecipe.htm", ingredients=ingredients)
 
 @app.route("/addproduct", methods=["GET", "POST"])
 @login_required
@@ -242,6 +299,8 @@ def scanbarcode():
             return redirect(url_for("addproduct"))
         elif request.form.get("barcode_request_origin") == "addmeal":
             return redirect(url_for("addmeal"))
+        elif request.form.get("barcode_request_origin") == "addingredient":
+            return redirect(url_for("addingredient"))
     return render_template("scanbarcode.htm", barcode_request_origin=request.args.get("barcode_request_origin"))
 
 
