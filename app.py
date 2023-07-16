@@ -265,7 +265,13 @@ def addrecipe():
                 for k, v in ingredient.items():
                     res = con.execute("SELECT * FROM products WHERE id=?", (k,))
                     res = res.fetchone()
-                    ingredients.append({"product_name": res[1], "weight": float(v["weight"]), "calories": float(v["calories"]), "calories_per_100": float(res[2])})
+                    ingredients.append({"product_name": res[1], "weight": float(v["weight"]),
+                        "calories": float(v["calories"]),
+                        "calories_per_100": float(res[2]),
+                        "fats":res[3],
+                        "carbs":res[4],
+                        "proteins":res[5]            
+                        })
     
     if len(ingredients) > 0:
         for ingredient in ingredients:
@@ -274,9 +280,16 @@ def addrecipe():
         weights = 0
         for ingredient in ingredients:
             recipe["calories"] += ingredient["calories_per_100"] * ingredient["weight"]/recipe["weight"]
+            recipe["fats"] += ingredient["fats"] * ingredient["weight"]/recipe["weight"]
+            recipe["carbs"] += ingredient["carbs"] * ingredient["weight"]/recipe["weight"]
+            recipe["proteins"] += ingredient["proteins"] * ingredient["weight"]/recipe["weight"]
             weights += ingredient["weight"]/recipe["weight"]
 
         recipe["calories"] = round(recipe["calories"] / weights, 2)
+        recipe["fats"] = round(recipe["fats"] / weights, 2)
+        recipe["carbs"] = round(recipe["carbs"] / weights, 2)
+        recipe["proteins"] = round(recipe["proteins"] / weights, 2)
+
 
     if request.method == "POST":
         session["ingredients"] = []
