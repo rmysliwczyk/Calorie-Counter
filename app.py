@@ -249,15 +249,39 @@ def addingredient():
 @login_required
 def addrecipe():
     ingredients = []
+    recipe = {}
+    recipe["id"] = 0
+    recipe["name"] = ""
+    recipe["calories"] = 0
+    recipe["fats"] = 0
+    recipe["carbs"] = 0
+    recipe["proteins"] = 0
+    recipe["weight"] = 0
+    recipe["portion_size"] = 0
+
     with con:
         if session.get("ingredients"):
             for ingredient in session["ingredients"]:
                 for k, v in ingredient.items():
-                    res = con.execute("SELECT product_name FROM products WHERE id=?", (k,))
+                    res = con.execute("SELECT * FROM products WHERE id=?", (k,))
                     res = res.fetchone()
-                    ingredients.append({"product_name": res[0], "weight": v["weight"], "calories": v["calories"]})
-    print(ingredients)
-    return render_template("addrecipe.htm", ingredients=ingredients)
+                    ingredients.append({"product_name": res[1], "weight": float(v["weight"]), "calories": float(v["calories"]), "calories_per_100": float(res[2])})
+    
+    if len(ingredients) > 0:
+        for ingredient in ingredients:
+            recipe["weight"] += ingredient["weight"]
+
+        weights = 0
+        for ingredient in ingredients:
+            recipe["calories"] += ingredient["calories_per_100"] * ingredient["weight"]/recipe["weight"]
+            weights += ingredient["weight"]/recipe["weight"]
+
+        recipe["calories"] = round(recipe["calories"] / weights, 2)
+
+    if request.method == "POST":
+        session["ingredients"] = []
+
+    return render_template("addrecipe.htm", ingredients=ingredients, recipe=recipe)
 
 @app.route("/addproduct", methods=["GET", "POST"])
 @login_required
