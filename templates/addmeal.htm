@@ -19,7 +19,7 @@
         <div class="col-3">
             <button class="btn btn-primary" form="add_by_barcode" type="submit">Scan</button>
         </div>
-        </div>
+    </div>
 </div>
 
 {% if product_list is defined %}
@@ -28,13 +28,14 @@
         {% for product in product_list %}
             <div class="row">
                 <div class="col">
-                    <button class="btn" type="submit" name="product_from_list" id="product_from_list" value="{{product[0]}}">{{product[1]}}</button>
+                    <button class="btn" type="submit" name="product_from_list" id="product_from_list" value="{{product[0]}}">{{product["product_name"]}}</button>
                 </div>
             </div>
         {% endfor %}
     </div>
 </form>
 {% endif %}
+
 
 {% if selected_product is defined %}
 

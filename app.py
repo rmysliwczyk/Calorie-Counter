@@ -172,6 +172,7 @@ def addmeal():
         elif product_name:
             product_name = product_name.strip()
             with con:
+                con.row_factory = sqlite3.Row
                 res = con.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + product_name + "%",))
                 res = res.fetchall()
             return render_template("addmeal.htm", product_list=res, todays_date=date.today(), calories_today=session["calories_today"], meal_time=session["which_meal_time_to_add"], entered_string=product_name)
@@ -297,15 +298,15 @@ def addrecipe():
         recipe_name = request.form.get("recipe_name")
         portion_size = request.form.get("portion_size")
         with con:
-            con.execute("INSERT INTO recipes VALUES (?, ?, ?, ?, ?, ?, ?)", (None, recipe_name, recipe["calories"],
-                portion_size, recipe["fats"],
-                recipe["carbs"], recipe["proteins"]
+            con.execute("INSERT INTO products VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (None, recipe_name, recipe["calories"],
+                recipe["fats"], recipe["carbs"], 
+                recipe["proteins"], recipe["portion_size"], 0
                 ))
-            res = con.execute("SELECT id FROM recipes ORDER BY id DESC LIMIT 1")
+            res = con.execute("SELECT id FROM products ORDER BY id DESC LIMIT 1")
             res = res.fetchone()
             print(res)
             for ingredient in ingredients:
-                con.execute("INSERT INTO ingredients VALUES (?, ?, ?)", (None, res[0], ingredient["product_id"]))            
+                con.execute("INSERT INTO ingredients VALUES (?, ?, ?)", (ingredient["weight"], res[0], ingredient["product_id"]))            
 
 
         return redirect(url_for("index"))
