@@ -270,7 +270,8 @@ def addrecipe():
                         "calories_per_100": float(res[2]),
                         "fats":res[3],
                         "carbs":res[4],
-                        "proteins":res[5]            
+                        "proteins":res[5],
+                        "product_id":res[0]            
                         })
     
     if len(ingredients) > 0:
@@ -293,6 +294,21 @@ def addrecipe():
 
     if request.method == "POST":
         session["ingredients"] = []
+        recipe_name = request.form.get("recipe_name")
+        portion_size = request.form.get("portion_size")
+        with con:
+            con.execute("INSERT INTO recipes VALUES (?, ?, ?, ?, ?, ?, ?)", (None, recipe_name, recipe["calories"],
+                portion_size, recipe["fats"],
+                recipe["carbs"], recipe["proteins"]
+                ))
+            res = con.execute("SELECT id FROM recipes ORDER BY id DESC LIMIT 1")
+            res = res.fetchone()
+            print(res)
+            for ingredient in ingredients:
+                con.execute("INSERT INTO ingredients VALUES (?, ?, ?)", (None, res[0], ingredient["product_id"]))            
+
+
+        return redirect(url_for("index"))
 
     return render_template("addrecipe.htm", ingredients=ingredients, recipe=recipe)
 
