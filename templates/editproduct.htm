@@ -1,0 +1,93 @@
+{% extends "layout.htm" %}
+{% block title %}
+Edit product
+{% endblock %}
+{% block body %}
+<h2>Edit product</h2>
+
+<div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
+    <div class="row g-1">
+        <div class="col">
+            {{product["product_name"]}}
+        </div>
+    </div>
+    <div class="row g-1 justify-content-center text-center">
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">kcal/100g</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">Fats</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">Carbs</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-secondary rounded-1">Proteins</div>
+        </div>
+    </div>
+    {% if product["is_recipe"] %}
+    <div class="row g-1 justify-content-center text-center">
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">{{product["calories"]}}kcal</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">{{product["fats"]}}g</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">{{product["carbohydrates"]}}g</div>
+        </div>
+        <div class="col-3">
+            <div class="text-bg-light rounded-1">{{product["proteins"]}}g</div>
+        </div>
+    </div>
+    {% else %}
+    <form action="{{url_for('editproduct')}}" method="post">
+        <div class="row g-1 justify-content-center text-center">
+                <div class="col-3">
+                    <input class="form-control" name="product_calories" id="product_calories" type="number" value="{{product['calories']}}">
+                </div>
+                <div class="col-3">
+                    <input class="form-control" name="product_fats" id="product_fats" type="number" value="{{product['fats']}}">
+                </div>
+                <div class="col-3">
+                    <input class="form-control" name="product_carbohydrates" id="product_carbohydrates" type="number" value="{{product['carbohydrates']}}">
+                </div>
+                <div class="col-3">
+                    <input class="form-control" name="product_proteins" id="product_proteins" type="number" value="{{product['proteins']}}">
+                </div>
+        </div>
+    </form>
+    {% endif %}
+</div>
+{% if product["is_recipe"] %}
+<div class="container m-1 p-1 bg-body-secondary rounded-2 mx-auto">
+    {% for ingredient in ingredients %}
+        <div class="row g-1 mt-1">
+            <div class="col">
+                <div class="col">
+                    {{ingredient["product_name"]}}
+                </div>
+                <div class="col">
+                    Weight: {{ingredient["weight"]}}
+                </div>
+                <div class="col">
+                    Calories: {{ingredient["calories"]}}
+                </div>
+                <div class="col">
+                    EDIT
+                </div>
+                <div class="col">
+                    REMOVE
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<nav class="navbar fixed-bottom mt-5 bg-primary-subtle">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Calories today: {{calories_today}}</a>
+    </div>
+</nav>
+{% endblock %}

@@ -32,12 +32,16 @@
                                 <div class="col-2">
                                     {{meal[4]}}g
                                 </div>
-                                <div class="col-3">
+                                <div class="col-2">
                                     {{meal[5]}}kcal 
+                                </div>
+                                <div class="col-1">
+                                    <a href="{{url_for('editmeal')}}?meal_id={{meal[0]}}">Edit</a>
                                 </div>
                                 <div class="col-1">
                                     <form action="{{url_for('index')}}" method="post"> <button class="btn-close" id="meal_to_delete" name="meal_to_delete" value="{{meal[0]}}"></button></form>
                                 </div>
+                                
                             </div>
                         </div>
                         {% endif %}

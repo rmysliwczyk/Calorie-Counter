@@ -137,6 +137,7 @@ def browsedatabase():
         search_string = ""
 
     with con:
+        con.row_factory = sqlite3.Row
         res = con.execute("SELECT * FROM products WHERE product_name LIKE ? ORDER BY product_name ASC", ("%" + search_string + "%",))
         res = res.fetchall()
     return render_template("browsedatabase.htm", products=res)
@@ -197,6 +198,78 @@ def addmeal():
                 con.execute("INSERT INTO meals (date, username, product_name, weight, calories, meal_time) VALUES (?,?,?,?,?,?)", (meal_date, session["user"], product_name, meal_weight, session["new_meal_calories"], session["which_meal_time_to_add"]))
 
             return redirect(url_for("index"))
+
+
+@app.route("/editmeal", methods=["GET", "POST"])
+@login_required
+def editmeal():
+    if request.method == "GET":
+        meal_id = request.args.get("meal_id")
+        session["editing_meal_id"] = meal_id
+
+    if not session.get("editing_meal_id"):
+        return handle_error("No meal id for editing")
+    
+    meal = {}
+    product = {}
+    with con:
+        con.row_factory = sqlite3.Row
+        res = con.execute("SELECT * FROM meals WHERE id=?", (session["editing_meal_id"],))
+        meal = res.fetchone()
+        res = con.execute("SELECT * FROM products WHERE product_name=?", (meal["product_name"],))
+        product = res.fetchone()
+
+    if request.method == "POST":
+        meal_weight = request.form.get("weight")
+        new_calories = round(float(meal_weight) * float(product["calories"])/100.0, 2)
+        with con:
+            con.execute("UPDATE meals\
+                SET calories=?, weight=?\
+                WHERE id=?", (new_calories, meal_weight, meal["id"]))
+
+        session["editing_meal_id"] = None
+        return redirect(url_for("index"))
+        
+    else:
+        return render_template("editmeal.htm", product=product,
+            meal=meal, calorie_today=session["calories_today"])
+
+@app.route("/editproduct", methods=["GET", "POST"])
+@login_required
+def editproduct():
+    ingredients = []
+    ingredients_list_of_dicts = {}
+    product_id = request.args.get("id")
+    product = None
+
+    with con:
+        con.row_factory = sqlite3.Row
+        res = con.execute("SELECT * FROM products WHERE id=?", (product_id,))
+        product = res.fetchone()
+
+    if product["is_recipe"]:
+        with con:
+            con.row_factory = sqlite3.Row
+            res = con.execute("SELECT * FROM ingredients WHERE recipe_id=?", (product_id,))
+            ingredients = res.fetchall()
+
+    for ingredient in ingredients:
+        new_ingredient = {}
+        for k, v in ingredient.items():
+            new_ingredient[k] = v
+        ingredients_list_of_dicts.append(new_ingredient)
+            
+    print(ingredients_list_of_dicts)
+    
+    for ingredient in ingredients_dict:
+        with con:
+            con.row_factory = sqlite3.Row
+            res = con.execute("SELECT product_name FROM products WHERE id=?", (ingredient["ingredient_id"],))
+            res = res.fetchone()
+            ingredient["product_name"] = res
+
+    return render_template("editproduct.htm", product=product, ingredients=ingredients_dict)
+    
 
 @app.route("/addingredient", methods=["GET", "POST"])
 @login_required
@@ -297,21 +370,31 @@ def addrecipe():
         session["ingredients"] = []
         recipe_name = request.form.get("recipe_name")
         portion_size = request.form.get("portion_size")
+
         with con:
-            con.execute("INSERT INTO products VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (None, recipe_name, recipe["calories"],
+            barcode = 0
+            is_recipe = 1
+
+            con.execute("INSERT INTO products\
+             (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode, is_recipe)\
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (recipe_name, recipe["calories"],
                 recipe["fats"], recipe["carbs"], 
-                recipe["proteins"], recipe["portion_size"], 0
-                ))
+                recipe["proteins"], recipe["portion_size"],
+                barcode, is_recipe))
+
             res = con.execute("SELECT id FROM products ORDER BY id DESC LIMIT 1")
             res = res.fetchone()
-            print(res)
+
             for ingredient in ingredients:
-                con.execute("INSERT INTO ingredients VALUES (?, ?, ?)", (ingredient["weight"], res[0], ingredient["product_id"]))            
+                con.execute("INSERT INTO ingredients VALUES (?, ?, ?)",
+                    (ingredient["weight"], res[0], ingredient["product_id"]))            
 
 
         return redirect(url_for("index"))
 
-    return render_template("addrecipe.htm", ingredients=ingredients, recipe=recipe)
+    return render_template("addrecipe.htm", ingredients=ingredients,
+        recipe=recipe, calories_today=session["calories_today"])
 
 @app.route("/addproduct", methods=["GET", "POST"])
 @login_required
@@ -337,8 +420,8 @@ def addproduct():
         else:
             with con:
                 con.execute(
-                "INSERT INTO products (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode) VALUES (?,?,?,?,?,?,?) ",
-                (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode_post))
+                "INSERT INTO products (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode, is_recipe) VALUES (?,?,?,?,?,?,?) ",
+                (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode_post, 0))
             return render_template("addproduct.htm")
         
         return handle_error("Couldn't add product to database")
