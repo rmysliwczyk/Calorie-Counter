@@ -238,14 +238,31 @@ def editmeal():
 @login_required
 def editproduct():
     ingredients = []
-    ingredients_list_of_dicts = {}
+    ingredients_list_of_dicts = []
     product_id = request.args.get("id")
     product = None
+
+    if request.method == "POST":
+        with con:
+            con.execute("UPDATE products \
+                SET calories=?, fats=?, carbohydrates=?,\
+                proteins=? \
+                WHERE id=?",
+                (request.form.get("product_calories"),
+                request.form.get("product_fats"),
+                request.form.get("product_carbohydrates"),
+                request.form.get("product_proteins"),
+                request.form.get("product_id")
+                ))
+        return redirect(url_for("index"))
 
     with con:
         con.row_factory = sqlite3.Row
         res = con.execute("SELECT * FROM products WHERE id=?", (product_id,))
         product = res.fetchone()
+
+    if not product:
+        return handle_error("Product for editing not found")
 
     if product["is_recipe"]:
         with con:
@@ -255,20 +272,106 @@ def editproduct():
 
     for ingredient in ingredients:
         new_ingredient = {}
-        for k, v in ingredient.items():
-            new_ingredient[k] = v
+        new_ingredient["weight"] = ingredient["weight"]
+        new_ingredient["recipe_id"] = ingredient["recipe_id"]
+        new_ingredient["ingredient_id"] = ingredient["ingredient_id"]
         ingredients_list_of_dicts.append(new_ingredient)
-            
-    print(ingredients_list_of_dicts)
-    
-    for ingredient in ingredients_dict:
+
+
+    for ingredient in ingredients_list_of_dicts:
         with con:
             con.row_factory = sqlite3.Row
-            res = con.execute("SELECT product_name FROM products WHERE id=?", (ingredient["ingredient_id"],))
+            res = con.execute("SELECT * FROM products WHERE id=?", (ingredient["ingredient_id"],))
             res = res.fetchone()
-            ingredient["product_name"] = res
+            ingredient["product_name"] = res["product_name"]
+            ingredient["calories"] = float(res["calories"])/100.0 * float(ingredient["weight"])
 
-    return render_template("editproduct.htm", product=product, ingredients=ingredients_dict)
+    return render_template("editproduct.htm", product=product, ingredients=ingredients_list_of_dicts)
+    
+
+@app.route("/editingredient", methods=["GET", "POST"])
+@login_required
+def editingredient():
+    if request.method == "POST":
+        #Change recipe
+        recipe_ingredients = []
+        recipe = {}
+        recipe["id"] = 0
+        recipe["name"] = ""
+        recipe["calories"] = 0
+        recipe["fats"] = 0
+        recipe["carbs"] = 0
+        recipe["proteins"] = 0
+        recipe["weight"] = 0
+        recipe["portion_size"] = 0
+
+        with con:
+            con.row_factory = sqlite3.Row
+            res = con.execute("SELECT * FROM ingredients WHERE recipe_id=?", (session.get("recipe_id"),))
+            ingredients = res.fetchall()
+
+        for ingredient in ingredients:
+            with con:
+                con.row_factory = sqlite3.Row
+                res = con.execute("SELECT * FROM products WHERE id=?", (ingredient['ingredient_id'],))
+                product = res.fetchone()
+            recipe_ingredients.append({"id":product["id"], "product_name":product["product_name"],
+                "calories_per_100":float(product["calories"]), "fats":float(product["fats"]),
+                "carbs":float(product["carbohydrates"]), "proteins":float(product["proteins"]),
+                "weight":float(ingredient["weight"])})
+            
+            if int(ingredient["ingredient_id"]) == int(session["ingredient_id"]):
+                recipe_ingredients[-1]["weight"] = float(request.form.get("weight"))
+                with con:
+                    con.execute("UPDATE ingredients SET weight=? WHERE recipe_id=? AND ingredient_id=?", (request.form.get("weight"), session["recipe_id"], session["ingredient_id"]))
+
+        for ingredient in recipe_ingredients:
+            recipe["weight"] += float(ingredient["weight"])
+
+        weights = 0
+        for ingredient in recipe_ingredients:
+            recipe["calories"] += ingredient["calories_per_100"] * ingredient["weight"]/recipe["weight"]
+            recipe["fats"] += ingredient["fats"] * ingredient["weight"]/recipe["weight"]
+            recipe["carbs"] += ingredient["carbs"] * ingredient["weight"]/recipe["weight"]
+            recipe["proteins"] += ingredient["proteins"] * ingredient["weight"]/recipe["weight"]
+            weights += ingredient["weight"]/recipe["weight"]
+
+        recipe["calories"] = round(recipe["calories"] / weights, 2)
+        recipe["fats"] = round(recipe["fats"] / weights, 2)
+        recipe["carbs"] = round(recipe["carbs"] / weights, 2)
+        recipe["proteins"] = round(recipe["proteins"] / weights, 2)       
+
+        with con:
+            barcode = 0
+            is_recipe = 1
+
+            con.execute("UPDATE products\
+                SET calories=?, fats=?, carbohydrates=?,\
+                proteins=?\
+                WHERE id=?",
+                (recipe["calories"],
+                recipe["fats"], recipe["carbs"], 
+                recipe["proteins"], session["recipe_id"]))
+        
+        session["recipe_id"] = None
+        session["ingredient_id"] = None
+        return redirect(url_for('index'))
+
+    session["recipe_id"] = request.args.get("rec_id")
+    session["ingredient_id"] = request.args.get("ing_id")
+
+    if not session.get("recipe_id") or not session.get("ingredient_id"):
+        return handle_error("Incorrect recipe and/or ingredient id")
+
+    with con:
+        con.row_factory = sqlite3.Row
+        res = con.execute("SELECT * FROM products WHERE id=?", (session["ingredient_id"],))
+        product = res.fetchone()
+        res = con.execute("SELECT * FROM ingredients WHERE recipe_id=? AND ingredient_id=?",
+            (session["recipe_id"], session["ingredient_id"]))
+        ingredient = res.fetchone()
+
+    return render_template("editingredient.htm", product=product, ingredient=ingredient, calorie_today=session["calories_today"])
     
 
 @app.route("/addingredient", methods=["GET", "POST"])

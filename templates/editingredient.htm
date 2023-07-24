@@ -1,9 +1,9 @@
 {% extends "layout.htm" %}
 {% block title %}
-Edit product
+Edit ingredient
 {% endblock %}
 {% block body %}
-<h2>Edit product</h2>
+<h2>Edit ingredient</h2>
 
 <div class="m-1 p-1 container bg-body-secondary rounded-2 mx-auto">
     <div class="row g-1">
@@ -25,7 +25,6 @@ Edit product
             <div class="text-bg-secondary rounded-1">Proteins</div>
         </div>
     </div>
-    {% if product["is_recipe"] %}
     <div class="row g-1 justify-content-center text-center">
         <div class="col-3">
             <div class="text-bg-light rounded-1">{{product["calories"]}}kcal</div>
@@ -40,54 +39,40 @@ Edit product
             <div class="text-bg-light rounded-1">{{product["proteins"]}}g</div>
         </div>
     </div>
-    {% else %}
-    <form action="{{url_for('editproduct')}}" method="post">
+    <form action="{{url_for('editingredient')}}", method="post">
         <input type="hidden" name="product_id" id="product_id" value="{{product['id']}}">
-        <div class="row g-1 justify-content-center text-center">
-            <div class="col-3">
-                <input class="form-control" name="product_calories" id="product_calories" type="number" value="{{product['calories']}}">
-            </div>
-            <div class="col-3">
-                <input class="form-control" name="product_fats" id="product_fats" type="number" value="{{product['fats']}}">
-            </div>
-            <div class="col-3">
-                <input class="form-control" name="product_carbohydrates" id="product_carbohydrates" type="number" value="{{product['carbohydrates']}}">
-            </div>
-            <div class="col-3">
-                <input class="form-control" name="product_proteins" id="product_proteins" type="number" value="{{product['proteins']}}">
+        <div class="row g-1 mt-1">
+            <div class="col">
+                <input class="form-control" name="ingredient_calories_indicator" id="ingredient_calories_indicator" type="text" placeholder="Resulting calories (kcal)" disabled>
             </div>
         </div>
-        <div class="row g-1 m-1 justify-content-center text-center">
+        <div class="row g-1 mt-1">
+            <div class="col">
+                <input class="form-control" autocomplete="off"
+                    autofocus="on" type="number"
+                    step="0.1" name="weight"
+                    id="weight" min="0.0"
+                    placeholder="Weight (g)"
+                    value="{{ingredient['weight']}}">
+            </div>
             <div class="col">
                 <button class="btn btn-primary" type="submit">Confirm change</button>
             </div>
         </div>
     </form>
-    {% endif %}
 </div>
-{% if product["is_recipe"] %}
-<div class="container m-1 p-1 bg-body-secondary rounded-2 mx-auto">
-    {% for ingredient in ingredients %}
-        <div class="row g-1 mt-1">
-            <div class="col">
-                {{ingredient["product_name"]}}
-            </div>
-            <div class="col">
-                Weight: {{ingredient["weight"]}}
-            </div>
-            <div class="col">
-                Calories: {{ingredient["calories"]}}
-            </div>
-            <div class="col">
-                <a href="{{url_for('editingredient')}}?rec_id={{ingredient['recipe_id']}}&ing_id={{ingredient['ingredient_id']}}">Edit</a>
-            </div>
-            <div class="col">
-                REMOVE
-            </div>
-        </div>
-    {% endfor %}
-</div>
-{% endif %}
+<script>
+    let ingredient_calories = 0.0;
+
+    addEventListener("DOMContentLoaded", calculate_calories())
+    document.getElementById("weight").oninput = function () {calculate_calories()}
+
+    function calculate_calories(){
+        ingredient_calories = {{product["calories"]}}/100.0 * document.getElementById("weight").value;
+        ingredient_calories = ingredient_calories.toFixed(2);
+        document.getElementById("ingredient_calories_indicator").value = ingredient_calories + "kcal";
+    }
+</script>
 
 <nav class="navbar fixed-bottom mt-5 bg-primary-subtle">
     <div class="container-fluid">
