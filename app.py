@@ -420,7 +420,7 @@ def addproduct():
         else:
             with con:
                 con.execute(
-                "INSERT INTO products (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode, is_recipe) VALUES (?,?,?,?,?,?,?) ",
+                "INSERT INTO products (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode, is_recipe) VALUES (?,?,?,?,?,?,?,?) ",
                 (product_name, calories, fats, carbohydrates, proteins, portion_size, barcode_post, 0))
             return render_template("addproduct.htm")
         
