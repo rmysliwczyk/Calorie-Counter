@@ -239,7 +239,8 @@ def editmeal():
 def editproduct():
     ingredients = []
     ingredients_list_of_dicts = []
-    session["product_id"] = request.args.get("id")
+    if not session.get("product_id"):
+        session["product_id"] = request.args.get("id")
     product = None
 
     if request.method == "POST":
@@ -553,7 +554,7 @@ def scanbarcode():
         elif request.form.get("barcode_request_origin") == "addingredient":
             return redirect(url_for("addingredient"))
         elif request.form.get("barcode_request_origin") == "editproduct":
-            return redirect(url_for("editproduct", newbarcode="True"))
+            return redirect(url_for("editproduct",  newbarcode="True"))
     return render_template("scanbarcode.htm", barcode_request_origin=request.args.get("barcode_request_origin"))
 
 
