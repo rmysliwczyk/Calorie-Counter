@@ -239,7 +239,7 @@ def editmeal():
 def editproduct():
     ingredients = []
     ingredients_list_of_dicts = []
-    if not session.get("product_id"):
+    if request.args.get("id"):
         session["product_id"] = request.args.get("id")
     product = None
 
