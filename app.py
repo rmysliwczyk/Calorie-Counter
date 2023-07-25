@@ -257,8 +257,8 @@ def editproduct():
                     request.form.get("product_fats"),
                     request.form.get("product_carbohydrates"),
                     request.form.get("product_proteins"),
-                    request.form.get("product_id"),
-                    request.form.get("barcode")
+                    request.form.get("barcode"),
+                    request.form.get("product_id")
                     ))
         product_id = session["product_id"]
         session["product_id"] = None
