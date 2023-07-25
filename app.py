@@ -553,7 +553,7 @@ def scanbarcode():
         elif request.form.get("barcode_request_origin") == "addingredient":
             return redirect(url_for("addingredient"))
         elif request.form.get("barcode_request_origin") == "editproduct":
-            return redirect(urlf_for("editproduct", newbarcode="True"))
+            return redirect(url_for("editproduct", newbarcode="True"))
     return render_template("scanbarcode.htm", barcode_request_origin=request.args.get("barcode_request_origin"))
 
 
