@@ -239,26 +239,33 @@ def editmeal():
 def editproduct():
     ingredients = []
     ingredients_list_of_dicts = []
-    product_id = request.args.get("id")
+    session["product_id"] = request.args.get("id")
     product = None
 
     if request.method == "POST":
-        with con:
-            con.execute("UPDATE products \
-                SET calories=?, fats=?, carbohydrates=?,\
-                proteins=? \
-                WHERE id=?",
-                (request.form.get("product_calories"),
-                request.form.get("product_fats"),
-                request.form.get("product_carbohydrates"),
-                request.form.get("product_proteins"),
-                request.form.get("product_id")
-                ))
-        return redirect(url_for("index"))
+        if request.form.get("delete_product") == "True":
+            with con:
+                con.execute("DELETE FROM ingredients WHERE ingredient_id=?", (request.form.get("ingredient_id"),))
+        else:
+            with con:
+                con.execute("UPDATE products \
+                    SET calories=?, fats=?, carbohydrates=?,\
+                    proteins=?, barcode=? \
+                    WHERE id=?",
+                    (request.form.get("product_calories"),
+                    request.form.get("product_fats"),
+                    request.form.get("product_carbohydrates"),
+                    request.form.get("product_proteins"),
+                    request.form.get("product_id"),
+                    request.form.get("barcode")
+                    ))
+        product_id = session["product_id"]
+        session["product_id"] = None
+        return redirect(url_for("editproduct", id=product_id))
 
     with con:
         con.row_factory = sqlite3.Row
-        res = con.execute("SELECT * FROM products WHERE id=?", (product_id,))
+        res = con.execute("SELECT * FROM products WHERE id=?", (session["product_id"],))
         product = res.fetchone()
 
     if not product:
@@ -267,7 +274,7 @@ def editproduct():
     if product["is_recipe"]:
         with con:
             con.row_factory = sqlite3.Row
-            res = con.execute("SELECT * FROM ingredients WHERE recipe_id=?", (product_id,))
+            res = con.execute("SELECT * FROM ingredients WHERE recipe_id=?", (session["product_id"],))
             ingredients = res.fetchall()
 
     for ingredient in ingredients:
@@ -277,7 +284,6 @@ def editproduct():
         new_ingredient["ingredient_id"] = ingredient["ingredient_id"]
         ingredients_list_of_dicts.append(new_ingredient)
 
-
     for ingredient in ingredients_list_of_dicts:
         with con:
             con.row_factory = sqlite3.Row
@@ -286,7 +292,12 @@ def editproduct():
             ingredient["product_name"] = res["product_name"]
             ingredient["calories"] = float(res["calories"])/100.0 * float(ingredient["weight"])
 
-    return render_template("editproduct.htm", product=product, ingredients=ingredients_list_of_dicts)
+    if request.args.get("newbarcode") == "True":
+        barcode = session["barcode"]
+    else:
+        barcode = product["barcode"]
+
+    return render_template("editproduct.htm", product=product, barcode=barcode, ingredients=ingredients_list_of_dicts)
     
 
 @app.route("/editingredient", methods=["GET", "POST"])
@@ -541,6 +552,8 @@ def scanbarcode():
             return redirect(url_for("addmeal"))
         elif request.form.get("barcode_request_origin") == "addingredient":
             return redirect(url_for("addingredient"))
+        elif request.form.get("barcode_request_origin") == "editproduct":
+            return redirect(urlf_for("editproduct", newbarcode="True"))
     return render_template("scanbarcode.htm", barcode_request_origin=request.args.get("barcode_request_origin"))
 
 
