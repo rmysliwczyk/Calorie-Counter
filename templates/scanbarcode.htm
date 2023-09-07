@@ -27,7 +27,7 @@ function onScanSuccess(decodedText, decodedResult) {
   document.getElementById("barcode").setAttribute('value', decodedResult.decodedText);
   console.log(`Code matched = ${decodedText}`, decodedResult);
 
-  html5QrCode.stop();
+  html5QrcodeScanner.stop();
   // source: https://stackoverflow.com/a/29641185
   setTimeout(document.getElementById("barcode_form").submit(),1000);
 }
