@@ -40,7 +40,6 @@ function onScanFailure(error) {
 
 const html5QrCode = new Html5Qrcode("reader");
 const config = {fps: 10, qrbox: { width: 250, height:250 } };
-var cameraId = null;
 Html5Qrcode.getCameras().then(devices => {
   /**
    * devices would be an array of objects of type:
@@ -49,11 +48,11 @@ Html5Qrcode.getCameras().then(devices => {
   if (devices && devices.length) {
     var cameraId = devices[0].id;
     // .. use this to start scanning.
+    html5QrCode.start({deviceId: {exact: "cameraId"}}, config, onScanSuccess, onScanFailure);
+    console.log(cameraId);
   }}).catch(err => {
     console.log("Couldn't get cameras");
   });
-console.log(cameraId);
-html5QrCode.start({deviceId: {exact: "cameraId"}}, config, onScanSuccess, onScanFailure);
 //let html5QrcodeScanner = new Html5QrcodeScanner(
 //  "reader",
 //  { fps: 10, qrbox: {width: 250, height: 250},
